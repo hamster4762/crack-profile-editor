@@ -28,18 +28,53 @@
 
   const STYLE = `
     div[role="dialog"]:has(> #cp-editor) {
+      --cp-bg: #ffffff;
+      --cp-sidebar-bg: #f9fafb;
+      --cp-card-bg: #ffffff;
+      --cp-card-hover: #f3f4f6;
+      --cp-input-bg: #ffffff;
+      --cp-border: #d1d5db;
+      --cp-text: #1f2937;
+      --cp-muted: #6b7280;
+      --cp-neutral-button: #e5e7eb;
+      --cp-neutral-button-hover: #d1d5db;
+      --cp-accent: #2563eb;
+      --cp-accent-hover: #1d4ed8;
+      --cp-accent-ring: #2563eb55;
+      --cp-danger: #dc2626;
+      --cp-danger-hover: #b91c1c;
       width: 94vw !important;
       max-width: none !important;
       height: 92vh !important;
       height: 92dvh !important;
+      background: var(--cp-bg) !important;
+      color: var(--cp-text) !important;
+    }
+
+    body[data-theme="dark"] div[role="dialog"]:has(> #cp-editor) {
+      --cp-bg: #242321;
+      --cp-sidebar-bg: #2e2d2b;
+      --cp-card-bg: #1a1918;
+      --cp-card-hover: #353431;
+      --cp-input-bg: #141413;
+      --cp-border: #42413d;
+      --cp-text: #f0efeb;
+      --cp-muted: #9ca3af;
+      --cp-neutral-button: #2e2d2b;
+      --cp-neutral-button-hover: #42413d;
+      --cp-accent: #3b82f6;
+      --cp-accent-hover: #2563eb;
+      --cp-accent-ring: #3b82f655;
+      --cp-danger: #991b1b;
+      --cp-danger-hover: #7f1d1d;
     }
 
     #cp-editor {
       display: flex;
       height: 90%;
       min-height: 0;
-      border-top: 1px solid var(--border, #3d3d3d);
-      color: var(--text-text_primary, #f5f5f5);
+      border-top: 1px solid var(--cp-border);
+      color: var(--cp-text);
     }
 
     #cp-editor * {
@@ -51,8 +86,8 @@
       flex: 0 0 32%;
       flex-direction: column;
       width: 32%;
-      border-right: 1px solid var(--border, #3d3d3d);
-      background: var(--surface-tertiary, #242424);
+      border-right: 1px solid var(--cp-border);
+      background: var(--cp-sidebar-bg);
     }
 
     #cp-editor .cp-sidebar-header {
@@ -61,7 +96,7 @@
       justify-content: space-between;
       height: 8%;
       padding: 0 16px;
-      border-bottom: 1px solid var(--border, #3d3d3d);
+      border-bottom: 1px solid var(--cp-border);
       font-weight: 700;
     }
 
@@ -77,19 +112,19 @@
       padding: 12px;
       border: 1px solid transparent;
       border-radius: 10px;
-      background: var(--background, #171717);
+      background: var(--cp-card-bg);
       color: inherit;
       text-align: left;
       cursor: pointer;
     }
 
     #cp-editor .cp-item:hover {
-      filter: brightness(1.14);
+      background: var(--cp-card-hover);
     }
 
     #cp-editor .cp-item.is-selected {
-      border-color: var(--outline-primary, #8b5cf6);
-      box-shadow: 0 0 0 1px var(--outline-primary, #8b5cf6);
+      border-color: var(--cp-accent);
+      box-shadow: 0 0 0 1px var(--cp-accent);
     }
 
     #cp-editor .cp-item-title {
@@ -102,7 +137,7 @@
     #cp-editor .cp-current-badge {
       padding: 2px 5px;
       border-radius: 4px;
-      background: var(--surface-chat-primary, #7c3aed);
+      background: var(--cp-accent);
       color: #fff;
       font-size: 11px;
     }
@@ -111,7 +146,7 @@
       display: block;
       margin-top: 7px;
       overflow: hidden;
-      color: var(--text-text_secondary, #aaa);
+      color: var(--cp-muted);
       font-size: 12px;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -125,7 +160,7 @@
       min-height: 0;
       gap: 18px;
       padding: 28px;
-      background: var(--background, #171717);
+      background: var(--cp-bg);
     }
 
     #cp-editor label {
@@ -140,10 +175,10 @@
     #cp-editor textarea {
       width: 100%;
       padding: 12px;
-      border: 1px solid var(--input, #555);
+      border: 1px solid var(--cp-border);
       border-radius: 8px;
       outline: none;
-      background: var(--surface-tertiary, #242424);
+      background: var(--cp-input-bg);
       color: inherit;
       font: inherit;
       font-weight: 400;
@@ -151,8 +186,8 @@
 
     #cp-editor input:focus,
     #cp-editor textarea:focus {
-      border-color: var(--ring, #8b5cf6);
-      box-shadow: 0 0 0 2px #8b5cf655;
+      border-color: var(--cp-accent);
+      box-shadow: 0 0 0 2px var(--cp-accent-ring);
     }
 
     #cp-editor textarea {
@@ -175,7 +210,7 @@
       min-width: 0;
       max-width: 40%;
       overflow: hidden;
-      color: var(--text-text_tertiary, #999);
+      color: var(--cp-muted);
       font-size: 0.7em;
       font-weight: 400;
       text-overflow: ellipsis;
@@ -203,18 +238,32 @@
 
     #cp-editor .cp-button {
       padding: 11px 16px;
-      background: var(--surface-tertiary, #333);
+      background-color: var(--cp-neutral-button) !important;
+      color: var(--cp-text) !important;
+    }
+
+    #cp-editor .cp-button:hover {
+      background-color: var(--cp-neutral-button-hover) !important;
     }
 
     #cp-editor .cp-button.is-primary,
     #cp-editor .cp-add {
-      background: var(--primary, #7c3aed);
-      color: #fff;
+      background-color: var(--cp-accent) !important;
+      color: #fff !important;
+    }
+
+    #cp-editor .cp-button.is-primary:hover,
+    #cp-editor .cp-add:hover {
+      background-color: var(--cp-accent-hover) !important;
     }
 
     #cp-editor .cp-button.is-danger {
-      background: #991b1b;
-      color: #fff;
+      background-color: var(--cp-danger) !important;
+      color: #fff !important;
+    }
+
+    #cp-editor .cp-button.is-danger:hover {
+      background-color: var(--cp-danger-hover) !important;
     }
 
     #cp-editor .cp-add {
