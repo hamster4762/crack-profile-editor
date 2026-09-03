@@ -165,19 +165,29 @@
     #cp-editor .cp-footer {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 14px;
     }
 
-    #cp-editor .cp-status {
-      font-size: 12px;
+    div[role="dialog"]:has(> #cp-editor) .cp-status {
+      display: inline-block;
+      margin-left: 0.75em;
+      min-width: 0;
+      max-width: 40%;
+      overflow: hidden;
       color: var(--text-text_tertiary, #999);
+      font-size: 0.7em;
+      font-weight: 400;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+      white-space: nowrap;
     }
 
     #cp-editor .cp-actions {
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-end;
+      width: 100%;
       gap: 8px;
     }
 
@@ -237,6 +247,18 @@
 
       #cp-editor .cp-main {
         padding: 18px;
+      }
+
+      #cp-editor .cp-actions {
+        flex-wrap: nowrap;
+      }
+
+      #cp-editor .cp-actions .cp-button {
+        flex: 1 1 0;
+        min-width: 0;
+        padding-right: 2%;
+        padding-left: 2%;
+        font-size: 0.75em;
       }
     }
   `;
@@ -453,7 +475,6 @@
           <textarea class="cp-information" maxlength="500" placeholder="나이, 성별, 외형 등"></textarea>
         </label>
         <div class="cp-footer">
-          <span class="cp-status">프로필 정보를 불러오는 중...</span>
           <div class="cp-actions">
             <button class="cp-button cp-use" type="button">이 프로필 사용</button>
             <button class="cp-button cp-delete is-danger" type="button">삭제</button>
@@ -477,10 +498,14 @@
     root.innerHTML = createEditorMarkup();
     dialog.append(root);
 
+    const status = document.createElement('span');
+    status.className = 'cp-status';
+    status.textContent = '프로필 정보를 불러오는 중...';
+    dialog.querySelector('h2')?.insertAdjacentElement('afterend', status);
+
     const list = root.querySelector('.cp-list');
     const nameInput = root.querySelector('.cp-name');
     const informationInput = root.querySelector('.cp-information');
-    const status = root.querySelector('.cp-status');
     const addButton = root.querySelector('.cp-add');
     const useButton = root.querySelector('.cp-use');
     const deleteButton = root.querySelector('.cp-delete');
@@ -491,9 +516,8 @@
     let selected = profiles.find((profile) => profile.current) ?? profiles[0];
     let busy = false;
 
-    function setStatus(message, isError = false) {
+    function setStatus(message, _isError = false) {
       status.textContent = message;
-      status.style.color = isError ? '#ef4444' : '';
     }
 
     function setBusy(nextBusy) {
