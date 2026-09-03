@@ -28,9 +28,9 @@
 
   const STYLE = `
     div[role="dialog"]:has(> #cp-editor) {
-      width: min(1120px, calc(100vw - 40px)) !important;
+      width: 90% !important;
       max-width: none !important;
-      height: min(780px, calc(100vh - 40px)) !important;
+      height: 90% !important;
     }
 
     #cp-editor {
@@ -218,8 +218,8 @@
 
     @media (max-width: 760px) {
       div[role="dialog"]:has(> #cp-editor) {
-        width: calc(100vw - 20px) !important;
-        height: calc(100vh - 20px) !important;
+        width: 95% !important;
+        height: 95% !important;
       }
 
       #cp-editor {
