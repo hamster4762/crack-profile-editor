@@ -28,15 +28,16 @@
 
   const STYLE = `
     div[role="dialog"]:has(> #cp-editor) {
-      width: 90% !important;
+      width: 94vw !important;
       max-width: none !important;
-      height: 90% !important;
+      height: 92vh !important;
+      height: 92dvh !important;
     }
 
     #cp-editor {
       display: flex;
-      height: calc(100% - 73px);
-      min-height: 570px;
+      height: 90%;
+      min-height: 0;
       border-top: 1px solid var(--border, #3d3d3d);
       color: var(--text-text_primary, #f5f5f5);
     }
@@ -47,9 +48,9 @@
 
     #cp-editor .cp-sidebar {
       display: flex;
-      flex: 0 0 350px;
+      flex: 0 0 32%;
       flex-direction: column;
-      width: 350px;
+      width: 32%;
       border-right: 1px solid var(--border, #3d3d3d);
       background: var(--surface-tertiary, #242424);
     }
@@ -58,7 +59,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 58px;
+      height: 8%;
       padding: 0 16px;
       border-bottom: 1px solid var(--border, #3d3d3d);
       font-weight: 700;
@@ -121,6 +122,7 @@
       flex: 1;
       flex-direction: column;
       min-width: 0;
+      min-height: 0;
       gap: 18px;
       padding: 28px;
       background: var(--background, #171717);
@@ -155,7 +157,7 @@
 
     #cp-editor textarea {
       flex: 1;
-      min-height: 280px;
+      min-height: 35%;
       resize: vertical;
       line-height: 1.55;
     }
@@ -206,8 +208,8 @@
     }
 
     #cp-editor .cp-add {
-      width: 32px;
-      height: 32px;
+      width: 2em;
+      height: 2em;
       font-size: 23px;
     }
 
@@ -216,22 +218,21 @@
       cursor: wait;
     }
 
-    @media (max-width: 760px) {
+    @media (max-width: 47.5rem) {
       div[role="dialog"]:has(> #cp-editor) {
-        width: 95% !important;
-        height: 95% !important;
+        width: 96vw !important;
+        height: 96vh !important;
+        height: 96dvh !important;
       }
 
       #cp-editor {
         min-height: 0;
-        flex-direction: column;
+        flex-direction: row;
       }
 
       #cp-editor .cp-sidebar {
-        flex: 0 0 36%;
-        width: 100%;
-        border-right: 0;
-        border-bottom: 1px solid var(--border, #3d3d3d);
+        flex: 0 0 34%;
+        width: 34%;
       }
 
       #cp-editor .cp-main {
@@ -411,8 +412,8 @@
       'position:fixed!important',
       'left:-100000px!important',
       'top:0!important',
-      'width:440px!important',
-      'height:454px!important',
+      'width:40vw!important',
+      'height:50vh!important',
       'display:block!important',
       'visibility:visible!important',
       'pointer-events:none!important',
