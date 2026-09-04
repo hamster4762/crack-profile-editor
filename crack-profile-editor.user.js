@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         크랙 대화 프로필 편집기
 // @namespace    https://crack.wrtn.ai/
-// @version      1.0.0
+// @version      1.1.0
 // @description  대화 프로필을 2패널에서 추가, 수정, 삭제하고 현재 대화에 적용합니다. (version 관리방식: 크랙UI변경.기능추가및수정.핫픽스)
 // @author       gpt
 // @match        https://crack.wrtn.ai/*
@@ -107,15 +107,50 @@
     }
 
     #cp-editor .cp-item {
+      position: relative;
       width: 100%;
       margin: 0 0 8px;
-      padding: 12px;
+      padding: 0;
       border: 1px solid transparent;
       border-radius: 10px;
       background: var(--cp-card-bg);
       color: inherit;
       text-align: left;
       cursor: pointer;
+    }
+
+    #cp-editor .cp-item-select {
+      display: block;
+      width: 100%;
+      padding: 12px 44px 12px 12px;
+      border: 0;
+      border-radius: inherit;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    #cp-editor .cp-delete {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--cp-muted);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    #cp-editor .cp-delete:hover:not(:disabled) {
+      background: var(--cp-danger);
+      color: #fff;
     }
 
     #cp-editor .cp-item:hover {
@@ -197,6 +232,19 @@
       line-height: 1.55;
     }
 
+    #cp-editor .cp-information-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #cp-editor .cp-information-count {
+      color: var(--cp-muted);
+      font-size: 12px;
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+    }
+
     #cp-editor .cp-footer {
       display: flex;
       align-items: center;
@@ -274,6 +322,10 @@
 
     #cp-editor button:disabled {
       opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #cp-editor[aria-busy="true"] button:disabled {
       cursor: wait;
     }
 
@@ -520,13 +572,15 @@
           <input class="cp-name" maxlength="12" placeholder="나의 이름">
         </label>
         <label style="flex: 1">
-          정보
+          <span class="cp-information-heading">
+            <span>정보</span>
+            <span class="cp-information-count">0/500</span>
+          </span>
           <textarea class="cp-information" maxlength="500" placeholder="나이, 성별, 외형 등"></textarea>
         </label>
         <div class="cp-footer">
           <div class="cp-actions">
             <button class="cp-button cp-use" type="button">이 프로필 사용</button>
-            <button class="cp-button cp-delete is-danger" type="button">삭제</button>
             <button class="cp-button cp-save is-primary" type="button">적용</button>
           </div>
         </div>
@@ -557,7 +611,7 @@
     const informationInput = root.querySelector('.cp-information');
     const addButton = root.querySelector('.cp-add');
     const useButton = root.querySelector('.cp-use');
-    const deleteButton = root.querySelector('.cp-delete');
+    const informationCount = root.querySelector('.cp-information-count');
     const saveButton = root.querySelector('.cp-save');
 
     let accountProfileId = null;
@@ -574,7 +628,14 @@
       render();
     }
 
+    function updateInformationCount() {
+      informationCount.textContent = `${informationInput.value.length}/${informationInput.maxLength}`;
+    }
+
+    informationInput.addEventListener('input', updateInformationCount);
+
     function render() {
+      root.setAttribute('aria-busy', String(busy));
       const sortedProfiles = [...profiles].sort((left, right) => {
         return Number(right.current) - Number(left.current)
           || left.name.localeCompare(right.name, 'ko');
@@ -583,13 +644,15 @@
       list.replaceChildren();
 
       for (const profile of sortedProfiles) {
+        const item = document.createElement('div');
+        item.className = `cp-item${profile === selected ? ' is-selected' : ''}`;
         const button = document.createElement('button');
         const currentBadge = profile.current
           ? '<span class="cp-current-badge">현재</span>'
           : '';
 
         button.type = 'button';
-        button.className = `cp-item${profile === selected ? ' is-selected' : ''}`;
+        button.className = 'cp-item-select';
         button.innerHTML = `
           <span class="cp-item-title">
             ${currentBadge}${escapeHtml(profile.name || '이름 없음')}
@@ -601,16 +664,25 @@
           selected = profile;
           render();
         });
-        list.append(button);
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'cp-delete';
+        deleteButton.textContent = '×';
+        deleteButton.title = '프로필 삭제';
+        deleteButton.setAttribute('aria-label', `${profile.name || '이름 없음'} 프로필 삭제`);
+        deleteButton.disabled = busy || !profile.id || profile.current || !accountProfileId;
+        deleteButton.addEventListener('click', () => deleteProfile(profile));
+        item.append(button, deleteButton);
+        list.append(item);
       }
 
       nameInput.value = selected?.name ?? '';
       informationInput.value = selected?.information ?? '';
+      updateInformationCount();
 
       addButton.disabled = busy;
       saveButton.disabled = busy;
       useButton.disabled = busy || !selected?.id || selected.current;
-      deleteButton.disabled = busy || !selected?.id || selected.current;
     }
 
     async function refresh({ preserveSelection = false } = {}) {
@@ -718,9 +790,9 @@
       }
     });
 
-    deleteButton.addEventListener('click', async () => {
-      if (!selected?.id || !accountProfileId) return;
-      if (!confirm(`'${selected.name}' 프로필을 삭제할까요?`)) return;
+    async function deleteProfile(profile) {
+      if (busy || !profile?.id || profile.current || !accountProfileId) return;
+      if (!confirm(`'${profile.name}' 프로필을 삭제할까요?`)) return;
 
       setBusy(true);
       setStatus('삭제 중...');
@@ -728,7 +800,7 @@
       try {
         await profileRequest(
           'DELETE',
-          `/profiles/${accountProfileId}/chat-profiles/${selected.id}`,
+          `/profiles/${accountProfileId}/chat-profiles/${profile.id}`,
         );
         await refresh();
         setStatus('프로필을 삭제했습니다.');
@@ -738,7 +810,7 @@
       } finally {
         setBusy(false);
       }
-    });
+    }
 
     render();
 
